@@ -1,10 +1,4 @@
-*.iml
-.kotlin
-.gradle
-**/build/
-xcuserdata
 !src/**/build/
-local.properties
 .idea
 .DS_Store
 captures
@@ -17,3 +11,57 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+
+# Gradle
+.gradle/
+build/
+**/*.iml
+*.iml
+.idea/
+.kotlin/
+local.properties
+
+# Android specific
+**/build/
+**/generated/
+**/intermediates/
+**/platformBuild/
+*.apk
+*.aab
+*.aar
+*.dex
+*.hprof
+*.keystore
+
+# iOS specific
+.swiftpm/
+.build/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/
+*.playground/
+*.xcodeproj/project.xcworkspace/
+*.xcodeproj/xcshareddata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcshareddata/
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+DerivedData/
+Pods/
+Carthage/Build/
+*.app
+*.ipa
+*.dsym
+
+# macOS specific
+*.DS_Store
+
+# Kotlin Native specific
+**/*.kmm
+**/*.klib
+**/*.knm
+**/*.kexe
+
+# Other
+gradle.properties.local
+# Add any other sensitive files or local configurations here
