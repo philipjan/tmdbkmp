@@ -44,6 +44,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.bundles.androidx.common)
+            implementation(projects.utility)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
