@@ -62,7 +62,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                implementation(libs.ktor.client.core)
+                implementation(libs.bundles.ktor.client.common)
                 implementation(libs.kotlinx.coroutines.core)
                 // module
                 implementation(projects.domain)
