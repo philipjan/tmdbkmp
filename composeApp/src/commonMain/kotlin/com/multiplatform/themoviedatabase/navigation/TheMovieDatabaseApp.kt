@@ -9,8 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.multiplatform.themoviedatabase.screens.LandingScreen
-import com.multiplatform.themoviedatabase.screens.SplashScreen
+import com.multiplatform.themoviedatabase.screens.landing.LandingScreen
+import com.multiplatform.themoviedatabase.screens.splash.SplashScreen
 
 enum class Screens(val title: String) {
     Splash("Splash"),

@@ -1,4 +1,4 @@
-package com.multiplatform.themoviedatabase.screens
+package com.multiplatform.themoviedatabase.screens.landing
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image

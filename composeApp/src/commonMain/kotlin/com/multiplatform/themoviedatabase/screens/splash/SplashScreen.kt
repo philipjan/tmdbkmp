@@ -1,4 +1,4 @@
-package com.multiplatform.themoviedatabase.screens
+package com.multiplatform.themoviedatabase.screens.splash
 
 import androidx.compose.runtime.Composable
 
