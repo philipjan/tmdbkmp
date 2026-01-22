@@ -47,6 +47,7 @@ kotlin {
             // modules
             implementation(projects.utility)
             implementation(projects.domain)
+            implementation(libs.compose.preview.tooling)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
