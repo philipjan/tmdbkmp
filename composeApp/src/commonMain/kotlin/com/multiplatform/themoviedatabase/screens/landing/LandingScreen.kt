@@ -3,6 +3,7 @@ package com.multiplatform.themoviedatabase.screens.landing
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.multiplatform.themoviedatabase.Greeting
 import org.jetbrains.compose.resources.painterResource
 import themoviedatabase.composeapp.generated.resources.Res
@@ -33,12 +35,17 @@ fun LandingScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Button(onClick = { showContent = !showContent }) {
-            Text("Click me!")
+            Text("Click me??")
         }
         AnimatedVisibility(showContent) {
             val greeting = remember { Greeting().greet() }
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red)
+                    .clickable(onClick = {
+                        showContent = !showContent
+                    }),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(painterResource(Res.drawable.compose_multiplatform), null)
