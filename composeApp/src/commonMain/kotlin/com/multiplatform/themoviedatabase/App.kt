@@ -1,14 +1,14 @@
 package com.multiplatform.themoviedatabase
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.multiplatform.themoviedatabase.navigation.TheMovieDatabaseApp
+import com.multiplatform.themoviedatabase.ui.theme.TmdbTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    TmdbTheme {
         TheMovieDatabaseApp()
     }
 }

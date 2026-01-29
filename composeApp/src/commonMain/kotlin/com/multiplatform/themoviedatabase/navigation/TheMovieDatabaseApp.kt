@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.multiplatform.themoviedatabase.screens.landing.LandingScreen
 import com.multiplatform.themoviedatabase.screens.splash.SplashScreen
 
-enum class Screens(val title: String) {
+enum class Screens(val route: String) {
     Splash("Splash"),
     Landing("Landing")
 }
@@ -26,15 +26,19 @@ fun TheMovieDatabaseApp(
     Scaffold { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screens.Landing.title,
+            startDestination = Screens.Splash.route,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            composable(route = Screens.Splash.title ) {
-                SplashScreen()
+            composable(route = Screens.Splash.route ) {
+                SplashScreen(
+                    onDataLoaded = {
+                        navController.navigate(route = Screens.Landing.route)
+                    }
+                )
             }
-            composable(route = Screens.Landing.title) {
+            composable(route = Screens.Landing.route) {
                 LandingScreen()
             }
         }
