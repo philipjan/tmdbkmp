@@ -1,46 +1,63 @@
 package com.multiplatform.themoviedatabase.navigation
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
+import androidx.savedstate.serialization.SavedStateConfiguration
 import com.multiplatform.themoviedatabase.screens.landing.LandingScreen
 import com.multiplatform.themoviedatabase.screens.splash.SplashScreen
-
-enum class Screens(val route: String) {
-    Splash("Splash"),
-    Landing("Landing")
-}
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 
 
 @Composable
 fun TheMovieDatabaseApp(
-    navController: NavHostController = rememberNavController(),
     modifier: Modifier = Modifier
 ) {
+    val backStack = rememberNavBackStack(
+        configuration = SavedStateConfiguration {
+            serializersModule = SerializersModule {
+                polymorphic(NavKey::class) {
+                    subclass(Screens.Splash::class, Screens.Splash.serializer())
+                    subclass(Screens.Landing::class, Screens.Landing.serializer())
+                }
+            }
+        },
+        elements = listOf(Screens.Splash).toTypedArray()
+    )
+
+
     Scaffold { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screens.Splash.route,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            composable(route = Screens.Splash.route ) {
-                SplashScreen(
-                    onDataLoaded = {
-                        navController.navigate(route = Screens.Landing.route)
+        NavDisplay(
+            backStack = backStack,
+            modifier = modifier,
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(removeViewModelStoreOnPop = { false })
+            ),
+            entryProvider = { navKey ->
+                when(navKey) {
+                    is Screens.Splash -> {
+                        NavEntry(navKey) {
+                            SplashScreen {
+                                backStack.add(Screens.Landing)
+                            }
+                        }
                     }
-                )
+                    is Screens.Landing -> {
+                        NavEntry(navKey) {
+                            LandingScreen()
+                        }
+                    }
+                    else -> error("Unknown NavKey ---> $navKey")
+                }
             }
-            composable(route = Screens.Landing.route) {
-                LandingScreen()
-            }
-        }
+        )
     }
 }
