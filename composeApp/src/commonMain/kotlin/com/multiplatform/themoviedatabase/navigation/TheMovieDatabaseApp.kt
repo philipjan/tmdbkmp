@@ -1,5 +1,6 @@
 package com.multiplatform.themoviedatabase.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,8 +36,8 @@ fun TheMovieDatabaseApp(
 
     Scaffold { innerPadding ->
         NavDisplay(
+            modifier = modifier.padding(innerPadding),
             backStack = backStack,
-            modifier = modifier,
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
                 rememberViewModelStoreNavEntryDecorator(removeViewModelStoreOnPop = { false })
@@ -51,6 +52,8 @@ fun TheMovieDatabaseApp(
                         }
                     }
                     is Screens.Landing -> {
+                        // we don't want to go back to splash after auto navigation earlier from app launch
+                        backStack.remove(Screens.Splash)
                         NavEntry(navKey) {
                             LandingScreen()
                         }
