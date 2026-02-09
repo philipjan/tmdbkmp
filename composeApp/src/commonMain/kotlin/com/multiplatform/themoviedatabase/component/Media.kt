@@ -23,7 +23,6 @@ fun Media(
         modifier = modifier
             .size(200.dp, 300.dp)
             .clickable(onClick = onClicked),
-        imageOptions = ImageOptions(),
         loading = {
             Box(
                 contentAlignment = Alignment.Center
