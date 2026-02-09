@@ -45,6 +45,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.bundles.androidx.common)
+            implementation(libs.bundles.coil.bundle)
             // modules
             implementation(projects.utility)
             implementation(projects.domain)
