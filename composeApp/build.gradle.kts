@@ -45,11 +45,15 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.bundles.androidx.common)
-            implementation(libs.bundles.coil.bundle)
+            implementation(libs.bundles.landscapist.imageloader)
             // modules
             implementation(projects.utility)
             implementation(projects.domain)
             implementation(libs.compose.preview.tooling)
+
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

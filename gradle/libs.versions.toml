@@ -20,10 +20,10 @@ detekt = "1.23.8"
 kotlinStdlib = "2.3.0"
 runner = "1.7.0"
 core = "1.7.0"
-kotlinx-serialization = "2.3.0"
+kotlinx-serialization = "2.3.10"
 kotlinxSerializationJson = "1.10.0"
 ktor = "3.4.0"
-coil = "3.3.0"
+landscapist = "2.9.3"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -59,9 +59,9 @@ ktor-client-kotlinx-auth= { module = "io.ktor:ktor-client-auth", version.ref = "
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
-coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-coil-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
-
+landscapist-image = { module = "com.github.skydoves:landscapist-image", version.ref = "landscapist" }
+landscapist-core = { module = "com.github.skydoves:landscapist-core", version.ref = "landscapist" }
+landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapist" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -78,4 +78,4 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 [bundles]
 androidx-common = ["androidx-lifecycle-viewmodelCompose", "androidx-lifecycle-runtimeCompose", "compose-navigation3", "compose-navigation3-viewmodel", "jetbrains-lifecycle-viewmodelCompose"]
 ktor-client-common = [ "ktor-client-core", "ktor-client-engine-cio", "ktor-client-content-negotiation", "ktor-client-kotlinx-json", "ktor-client-kotlinx-auth"]
-coil-bundle = ["coil-compose", "coil-okhttp"]
+landscapist-imageloader = ["landscapist-core", "landscapist-image", "landscapist-placeholder"]
