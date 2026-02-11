@@ -1,4 +1,6 @@
 package com.multiplatform.themoviedatabase.screens.landing.states
 
-class LandingState {
+import com.multiplatform.themoviedatabase.component.State
+
+class LandingState: State {
 }

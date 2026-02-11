@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -11,8 +12,11 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.multiplatform.data.repository.MovieRepositoryImpl
 import com.multiplatform.themoviedatabase.screens.landing.LandingScreen
 import com.multiplatform.themoviedatabase.screens.splash.SplashScreen
+import com.multiplatform.themoviedatabase.screens.splash.SplashViewModel
+import com.multiplatform.themoviedatabase.screens.splash.states.SplashState
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -33,6 +37,13 @@ fun TheMovieDatabaseApp(
         elements = listOf(Screens.Splash).toTypedArray()
     )
 
+    // TODO: refactor and inject the repository
+    val splashViewModel: SplashViewModel = viewModel {
+        SplashViewModel(
+            movieRepository = MovieRepositoryImpl(),
+            initialState = SplashState.initial()
+        )
+    }
 
     Scaffold { innerPadding ->
         NavDisplay(
@@ -46,9 +57,10 @@ fun TheMovieDatabaseApp(
                 when(navKey) {
                     is Screens.Splash -> {
                         NavEntry(navKey) {
-                            SplashScreen {
-                                backStack.add(Screens.Landing)
-                            }
+                            SplashScreen(
+                                state = splashViewModel.state,
+                                onDataLoaded = { backStack.add(Screens.Landing) }
+                            )
                         }
                     }
                     is Screens.Landing -> {

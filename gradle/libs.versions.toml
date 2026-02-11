@@ -56,6 +56,7 @@ ktor-client-engine-cio = { module = "io.ktor:ktor-client-cio", version.ref = "kt
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-kotlinx-json= { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-kotlinx-auth= { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+ktor-client-kotlinx-logging= { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
@@ -77,5 +78,5 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 
 [bundles]
 androidx-common = ["androidx-lifecycle-viewmodelCompose", "androidx-lifecycle-runtimeCompose", "compose-navigation3", "compose-navigation3-viewmodel", "jetbrains-lifecycle-viewmodelCompose"]
-ktor-client-common = [ "ktor-client-core", "ktor-client-engine-cio", "ktor-client-content-negotiation", "ktor-client-kotlinx-json", "ktor-client-kotlinx-auth"]
+ktor-client-common = [ "ktor-client-core", "ktor-client-engine-cio", "ktor-client-content-negotiation", "ktor-client-kotlinx-json", "ktor-client-kotlinx-auth", "ktor-client-kotlinx-logging"]
 landscapist-imageloader = ["landscapist-core", "landscapist-image", "landscapist-placeholder"]

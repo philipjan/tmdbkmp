@@ -1,4 +1,4 @@
-package com.multiplatform.data.datasource.remote
+package com.multiplatform.utility.util
 
 object Endpoint {
     val URL_AUTHENTICATION = "authentication"
@@ -11,4 +11,8 @@ object Endpoint {
 
 object Path {
     val PARAM_COLLECTIONID = "collection_id"
+}
+
+object QueryParams {
+    val QUERY_PARAM_PAGE = "page"
 }

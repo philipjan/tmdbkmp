@@ -1,7 +1,9 @@
 package com.multiplatform.data.model.base
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 open class BaseMedia(
     @SerialName("adult")
     open val adult: Boolean? = null,

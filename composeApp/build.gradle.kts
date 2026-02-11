@@ -49,6 +49,8 @@ kotlin {
             // modules
             implementation(projects.utility)
             implementation(projects.domain)
+            // TODO: refactor in the future and remove data module; inject using Dependency Injection tools
+            implementation(projects.data)
             implementation(libs.compose.preview.tooling)
 
         }

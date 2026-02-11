@@ -6,36 +6,34 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 interface State
-interface Action
-interface Reducer<S: State, A: Action> {
+interface Intent
+interface Reducer<S: State, A: Intent> {
     /**
-     * Generates a new instance of the [State] based on the [Action]
+     * Generates a new instance of the [State] based on the [Intent]
      *
      * @param state the current [State]
-     * @param action the [Action] to reduce the [State] with
+     * @param intent the [Intent] to reduce the [State] with
      * @return the reduced [State]
      */
-    fun reduce(state: S, action: A): S
+    suspend fun reduce(state: S, intent: A): S
 }
 
-interface Dispatcher<A: Action> {
+interface Dispatcher<A: Intent> {
     fun dispatch(action: A)
 }
 
-abstract class MiddleWare<S: State, A: Action>() {
-    private lateinit var dispatcher: Dispatcher<A>
+abstract class MiddleWare<S: State, I: Intent>() {
+    private lateinit var dispatcher: Dispatcher<I>
 
-    abstract suspend fun process(state: S, action: A)
+    abstract suspend fun process(state: S, intent: I)
 
-    protected fun dispatch(action: A) = dispatcher.dispatch(action)
+    protected fun dispatch(intent: I) = dispatcher.dispatch(intent)
 
     internal fun setDispatcher(
-        dispatcher: Dispatcher<A>,
+        dispatcher: Dispatcher<I>,
     ) {
         this.dispatcher = dispatcher
     }
@@ -43,26 +41,17 @@ abstract class MiddleWare<S: State, A: Action>() {
 
 
 
-open class MviViewModel<S: State, A: Action>(
-    private val reducer: Reducer<S, A>,
-    private val middleWares: List<MiddleWare<S, A>> = emptyList(),
+open class MviViewModel<S: State, I: Intent>(
+    private val reducer: Reducer<S, I>,
     initialState: S
-): ViewModel(), Dispatcher<A> {
+): ViewModel(), Dispatcher<I> {
 
-    private val actions = MutableSharedFlow<A>(extraBufferCapacity = 64)
+    private val actions = MutableSharedFlow<I>(extraBufferCapacity = 64)
 
     var state: S by mutableStateOf(initialState)
         private set
 
     init {
-        middleWares.forEach { middleWare -> middleWare.setDispatcher(this) }
-        viewModelScope.launch {
-            actions.onEach { action ->
-                middleWares.forEach { middleWare ->
-                    middleWare.process(state, action)
-                }
-            }.collect()
-        }
         viewModelScope.launch {
             actions.collect {
                 state = reducer.reduce(state, it)
@@ -70,7 +59,7 @@ open class MviViewModel<S: State, A: Action>(
         }
     }
 
-    override fun dispatch(action: A) {
+    override fun dispatch(action: I) {
         val success = actions.tryEmit(action)
         if (!success) error("MVI action buffer overflow")
     }

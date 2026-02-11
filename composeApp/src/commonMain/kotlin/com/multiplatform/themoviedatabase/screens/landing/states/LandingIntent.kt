@@ -1,4 +1,6 @@
 package com.multiplatform.themoviedatabase.screens.landing.states
 
-class LandingIntent {
+import com.multiplatform.themoviedatabase.component.Intent
+
+sealed interface LandingIntent: Intent {
 }

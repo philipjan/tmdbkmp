@@ -8,6 +8,8 @@ import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
@@ -33,11 +35,16 @@ object TmdbHttpClient {
             bearer {
                 loadTokens {
                     BearerTokens(
-                        accessToken = "",
-                        refreshToken = ""
+                        accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwMjgxYWY5Y2VlZThlMTlhYjdhOTliN2YwNTZhMmQ4NiIsIm5iZiI6MTQ5MjQyNjI0Ny4zODUsInN1YiI6IjU4ZjQ5ZTAzOTI1MTQxM2RhNzAyMTdmZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.q0n-3DNnS9fXu1cs_87GIKj7YSKYSInd9Pe5puxpxWI",
+                        refreshToken = null
                     )
                 }
             }
+        }
+
+        // TODO: not working, fix once available
+        install(Logging) {
+            level = LogLevel.ALL
         }
 
         install(ContentNegotiation) {
@@ -58,9 +65,9 @@ object TmdbHttpClient {
             }
         }
         defaultRequest {
-            url(TmdbHttpClient.url)
-            headers.appendIfNameAbsent(HttpHeaders.ContentType, ContentType.Application.Json.contentType)
-            headers.appendIfNameAbsent(HttpHeaders.Accept, ContentType.Application.Json.contentType)
+            url(TmdbHttpClient.url.trim())
+            headers.appendIfNameAbsent(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            headers.appendIfNameAbsent(HttpHeaders.Accept, ContentType.Application.Json.toString())
         }
     }
 }
