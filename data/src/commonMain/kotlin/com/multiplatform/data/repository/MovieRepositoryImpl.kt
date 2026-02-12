@@ -9,10 +9,13 @@ import com.multiplatform.domain.repository.MovieRepository
 import com.multiplatform.utility.util.QueryParams
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 
 class MovieRepositoryImpl(private val client: TmdbHttpClient = TmdbHttpClient) : MovieRepository<MovieData> {
-    override suspend fun getMediaLists(endpoint: String, page: Int?): MovieData {
-        val result: BaseListResponse<Movie>? =  client.client.get(
+    override suspend fun getMediaLists(endpoint: String, page: Int?) = withContext(Dispatchers.IO) {
+        val result = client.client.get(
             urlString = endpoint,
             block = {
                 page?.let { pageValue ->
@@ -21,7 +24,7 @@ class MovieRepositoryImpl(private val client: TmdbHttpClient = TmdbHttpClient) :
                     }
                 }
             }
-        ).body()
-        return MovieMapper().mapTo(result)
+        ).body<BaseListResponse<Movie>>()
+        MovieMapper().mapTo(result)
     }
 }

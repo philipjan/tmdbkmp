@@ -37,7 +37,7 @@ fun TheMovieDatabaseApp(
         elements = listOf(Screens.Splash).toTypedArray()
     )
 
-    // TODO: refactor and inject the repository
+    // TODO: refactor and inject the repository using D.I
     val splashViewModel: SplashViewModel = viewModel {
         SplashViewModel(
             movieRepository = MovieRepositoryImpl(),
@@ -67,7 +67,12 @@ fun TheMovieDatabaseApp(
                         // we don't want to go back to splash after auto navigation earlier from app launch
                         backStack.remove(Screens.Splash)
                         NavEntry(navKey) {
-                            LandingScreen()
+                            LandingScreen(
+                                splashState = splashViewModel.state,
+                                onMediaClicked = { movie ->
+
+                                }
+                            )
                         }
                     }
                     else -> error("Unknown NavKey ---> $navKey")
