@@ -22,6 +22,4 @@ class SplashViewModel(
     fun loadData() {
         dispatch(SplashIntent.LoadInitialData)
     }
-
-    fun
 }

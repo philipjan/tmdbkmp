@@ -16,6 +16,8 @@ class SplashReducer(
             SplashIntent.LoadInitialData -> {
                 loadInitialData(state)
             }
+
+            is SplashIntent.LoadSucceedingData -> TODO()
         }
     }
 
