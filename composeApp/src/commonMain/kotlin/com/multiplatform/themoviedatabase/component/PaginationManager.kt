@@ -6,6 +6,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+// TODO: refactor to support current MVI-Reducer implementation to just plug it when needed
 class PaginationManager<T, K>(
     private val coroutineScope: CoroutineScope,
     private var currentPageKey: K,
