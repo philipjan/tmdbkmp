@@ -14,6 +14,8 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.multiplatform.data.repository.MovieRepositoryImpl
 import com.multiplatform.themoviedatabase.screens.landing.LandingScreen
+import com.multiplatform.themoviedatabase.screens.landing.LandingViewModel
+import com.multiplatform.themoviedatabase.screens.landing.states.LandingState
 import com.multiplatform.themoviedatabase.screens.splash.SplashScreen
 import com.multiplatform.themoviedatabase.screens.splash.SplashViewModel
 import com.multiplatform.themoviedatabase.screens.splash.states.SplashState
@@ -37,11 +39,20 @@ fun TheMovieDatabaseApp(
         elements = listOf(Screens.Splash).toTypedArray()
     )
 
+    val movieRepository = MovieRepositoryImpl()
+
     // TODO: refactor and inject the repository using D.I
     val splashViewModel: SplashViewModel = viewModel {
         SplashViewModel(
-            movieRepository = MovieRepositoryImpl(),
+            movieRepository = movieRepository,
             initialState = SplashState.initial()
+        )
+    }
+
+    val landingViewModel: LandingViewModel = viewModel {
+        LandingViewModel(
+            movieRepository = movieRepository,
+            initialState = LandingState.initial()
         )
     }
 
@@ -68,9 +79,12 @@ fun TheMovieDatabaseApp(
                         backStack.remove(Screens.Splash)
                         NavEntry(navKey) {
                             LandingScreen(
-                                splashState = splashViewModel.state,
+                                splashState = landingViewModel.state,
                                 onMediaClicked = { movie ->
 
+                                },
+                                initialConfig = {
+                                    landingViewModel.setInitialData(splashViewModel.state.movieData)
                                 }
                             )
                         }

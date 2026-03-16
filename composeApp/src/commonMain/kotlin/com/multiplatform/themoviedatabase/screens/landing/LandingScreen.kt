@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -14,17 +15,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.multiplatform.domain.entity.movie.Movie
 import com.multiplatform.themoviedatabase.component.Media
-import com.multiplatform.themoviedatabase.screens.splash.states.SplashState
+import com.multiplatform.themoviedatabase.screens.landing.states.LandingState
 import com.multiplatform.utility.util.Utility.generateImageUrl
 
 @Composable
 fun LandingScreen(
-    splashState: SplashState,
-    onMediaClicked: (Movie) -> Unit
+    splashState: LandingState,
+    onMediaClicked: (Movie) -> Unit,
+    initialConfig: (() -> Unit)? = null,
 ) {
     val gridState = rememberLazyGridState()
     val pullToRefreshState = rememberPullToRefreshState()
     val isLoading by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        initialConfig?.invoke()
+    }
 
     PullToRefreshBox(
         isRefreshing = isLoading,
@@ -55,7 +61,7 @@ fun LandingScreen(
 @Composable
 fun LandingScreenPreview() {
     LandingScreen(
-        splashState = SplashState.initial(),
+        splashState = LandingState.initial(),
         onMediaClicked = {_ ->}
     )
 }

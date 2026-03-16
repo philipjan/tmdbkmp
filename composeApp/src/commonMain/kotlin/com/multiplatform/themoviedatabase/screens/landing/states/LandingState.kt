@@ -6,12 +6,14 @@ import com.multiplatform.themoviedatabase.component.State
 data class LandingState(
     val movieData: MovieData? = null,
     val isLoading: Boolean = false,
+    val isPagingLoading: Boolean = false,
     val error: Exception? = null
 ): State {
     companion object {
-        fun initial(): LandingState {
+        fun initial(movieData: MovieData? = null): LandingState {
             return LandingState(
-                isLoading = true
+                movieData = movieData,
+                isLoading = movieData == null
             )
         }
     }

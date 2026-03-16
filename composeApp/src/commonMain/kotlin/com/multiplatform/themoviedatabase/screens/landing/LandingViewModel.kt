@@ -8,14 +8,31 @@ import com.multiplatform.themoviedatabase.screens.landing.states.LandingReducer
 import com.multiplatform.themoviedatabase.screens.landing.states.LandingState
 
 class LandingViewModel(
-    movieRepository: MovieRepository<MovieData>
+    movieRepository: MovieRepository<MovieData>,
+    initialState: LandingState = LandingState.initial()
 ): MviViewModel<LandingState, LandingIntent>(
     reducer = LandingReducer(movieRepository = movieRepository),
-    initialState = LandingState.initial()
+    initialState = initialState
 ) {
-
     init {
-
+//        if (state.movieData == null) {
+//            loadInitial()
+//        }
     }
-    
+
+    fun loadInitial(movieData: MovieData? = null) {
+        dispatch(LandingIntent.LoadInitialData(movieData))
+    }
+
+    fun loadNext() {
+        dispatch(LandingIntent.LoadSucceedingData(state.movieData?.page))
+    }
+
+    fun setInitialData(movieData: MovieData?) {
+        if (movieData != null) {
+            loadInitial(movieData)
+        } else {
+            loadInitial()
+        }
+    }
 }
