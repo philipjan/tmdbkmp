@@ -8,6 +8,7 @@ object Endpoint {
 
     val ENDPOINT_MOVIE_DETAILS ="collection/${Path.PARAM_COLLECTIONID}"
     val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w300"
+    val IMAGE_BASE_URL_DESKTOP = "https://image.tmdb.org/t/p/w500"
 }
 
 object Path {

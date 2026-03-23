@@ -182,7 +182,7 @@ private fun BackdropWithTopBar(
     ) {
         if (!backdropPath.isNullOrBlank()) {
             LandscapistImage(
-                imageModel = { backdropPath.generateImageUrl() },
+                imageModel = { backdropPath.generateImageUrl(isDesktop = showTopBar) },
                 modifier = Modifier.fillMaxSize(),
                 imageOptions = ImageOptions(contentScale = ContentScale.Crop)
             )
