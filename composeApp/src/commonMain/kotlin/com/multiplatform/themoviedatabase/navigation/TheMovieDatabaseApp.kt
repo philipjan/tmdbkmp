@@ -34,6 +34,7 @@ fun TheMovieDatabaseApp(
                 polymorphic(NavKey::class) {
                     subclass(Screens.Splash::class, Screens.Splash.serializer())
                     subclass(Screens.Landing::class, Screens.Landing.serializer())
+                    subclass(Screens.MovieDetails::class, Screens.MovieDetails.serializer())
                 }
             }
         },
