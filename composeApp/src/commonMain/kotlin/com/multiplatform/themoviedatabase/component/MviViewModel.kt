@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
@@ -43,7 +45,8 @@ abstract class MiddleWare<S: State, I: Intent>() {
 
 open class MviViewModel<S: State, I: Intent>(
     private val reducer: Reducer<S, I>,
-    initialState: S
+    initialState: S,
+    private val coroutineScope: CoroutineScope? = null,
 ): ViewModel(), Dispatcher<I> {
 
     private val actions = MutableSharedFlow<I>(extraBufferCapacity = 64)
@@ -51,8 +54,10 @@ open class MviViewModel<S: State, I: Intent>(
     var state: S by mutableStateOf(initialState)
         private set
 
+    private val scope: CoroutineScope get() = coroutineScope ?: viewModelScope
+
     init {
-        viewModelScope.launch {
+        scope.launch {
             actions.collect {
                 state = reducer.reduce(state, it)
             }

@@ -6,13 +6,16 @@ import com.multiplatform.themoviedatabase.component.MviViewModel
 import com.multiplatform.themoviedatabase.screens.landing.states.LandingIntent
 import com.multiplatform.themoviedatabase.screens.landing.states.LandingReducer
 import com.multiplatform.themoviedatabase.screens.landing.states.LandingState
+import kotlinx.coroutines.CoroutineScope
 
 class LandingViewModel(
     movieRepository: MovieRepository<MovieData>,
-    initialState: LandingState = LandingState.initial()
+    initialState: LandingState = LandingState.initial(),
+    coroutineScope: CoroutineScope? = null
 ): MviViewModel<LandingState, LandingIntent>(
     reducer = LandingReducer(movieRepository = movieRepository),
-    initialState = initialState
+    initialState = initialState,
+    coroutineScope = coroutineScope
 ) {
     init {
 //        if (state.movieData == null) {

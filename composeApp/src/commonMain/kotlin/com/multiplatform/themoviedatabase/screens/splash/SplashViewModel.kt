@@ -6,13 +6,16 @@ import com.multiplatform.themoviedatabase.component.MviViewModel
 import com.multiplatform.themoviedatabase.screens.splash.states.SplashIntent
 import com.multiplatform.themoviedatabase.screens.splash.states.SplashReducer
 import com.multiplatform.themoviedatabase.screens.splash.states.SplashState
+import kotlinx.coroutines.CoroutineScope
 
 class SplashViewModel(
     movieRepository: MovieRepository<MovieData>,
-    initialState: SplashState = SplashState.initial()
+    initialState: SplashState = SplashState.initial(),
+    coroutineScope: CoroutineScope? = null,
 ): MviViewModel<SplashState, SplashIntent>(
     reducer = SplashReducer(movieRepository = movieRepository),
-    initialState = initialState
+    initialState = initialState,
+    coroutineScope = coroutineScope,
 ) {
 
     init {
