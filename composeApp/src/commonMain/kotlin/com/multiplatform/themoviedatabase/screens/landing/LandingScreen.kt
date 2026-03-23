@@ -34,7 +34,6 @@ fun LandingScreen(
     loadNext: () -> Unit
 ) {
     val gridState = rememberLazyGridState()
-    val pullToRefreshState = rememberPullToRefreshState()
 
     LaunchedEffect(Unit) {
         initialConfig?.invoke()
@@ -57,38 +56,32 @@ fun LandingScreen(
         }
     }
 
-    PullToRefreshBox(
-        isRefreshing = landingState.isLoading,
-        onRefresh = {},
-        state = pullToRefreshState
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        state = gridState
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            state = gridState
-        ) {
-            itemsIndexed(
-                items = landingState.movieData?.movies.orEmpty(),
-            ) { _, item ->
-                key(item.id) {
-                    Media(
-                        sourceUrl = item.posterPath.orEmpty().generateImageUrl(),
-                        onClicked = {
-                            onMediaClicked(item)
-                        }
-                    )
-                }
-            }
-
-            if (landingState.isPagingLoading) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+        itemsIndexed(
+            items = landingState.movieData?.movies.orEmpty(),
+        ) { _, item ->
+            key(item.id) {
+                Media(
+                    sourceUrl = item.posterPath.orEmpty().generateImageUrl(),
+                    onClicked = {
+                        onMediaClicked(item)
                     }
+                )
+            }
+        }
+
+        if (landingState.isPagingLoading) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }
