@@ -13,6 +13,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.multiplatform.data.repository.MovieRepositoryImpl
+import com.multiplatform.themoviedatabase.screens.detail.DetailsScreen
 import com.multiplatform.themoviedatabase.screens.landing.LandingScreen
 import com.multiplatform.themoviedatabase.screens.landing.LandingViewModel
 import com.multiplatform.themoviedatabase.screens.landing.states.LandingState
@@ -81,13 +82,18 @@ fun TheMovieDatabaseApp(
                             LandingScreen(
                                 landingState = landingViewModel.state,
                                 onMediaClicked = { movie ->
-
+                                    backStack.add(Screens.MovieDetails(movie))
                                 },
                                 initialConfig = {
                                     landingViewModel.setInitialData(splashViewModel.state.movieData)
                                 },
                                 loadNext = { landingViewModel.loadNext() }
                             )
+                        }
+                    }
+                    is Screens.MovieDetails -> {
+                        NavEntry(navKey) {
+                            DetailsScreen(navKey.movie)
                         }
                     }
                     else -> error("Unknown NavKey ---> $navKey")

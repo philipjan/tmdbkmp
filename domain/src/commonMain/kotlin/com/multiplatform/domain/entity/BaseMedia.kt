@@ -1,5 +1,8 @@
 package com.multiplatform.domain.entity
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 open class BaseMedia(
     open var adult: Boolean? = null,
     open var backdropPath: String? = null,
