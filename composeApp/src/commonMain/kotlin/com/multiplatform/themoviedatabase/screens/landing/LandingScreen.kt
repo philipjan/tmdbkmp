@@ -12,17 +12,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.tooling.preview.Preview
 import com.multiplatform.domain.entity.movie.Movie
 import com.multiplatform.themoviedatabase.component.Media
 import com.multiplatform.themoviedatabase.screens.landing.states.LandingState
 import com.multiplatform.utility.util.Utility.generateImageUrl
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun LandingScreen(
-    splashState: LandingState,
+    landingState: LandingState,
     onMediaClicked: (Movie) -> Unit,
     initialConfig: (() -> Unit)? = null,
+    loadNext: () -> Unit
 ) {
     val gridState = rememberLazyGridState()
     val pullToRefreshState = rememberPullToRefreshState()
@@ -30,6 +33,24 @@ fun LandingScreen(
 
     LaunchedEffect(Unit) {
         initialConfig?.invoke()
+    }
+
+    LaunchedEffect(gridState) {
+        snapshotFlow {
+            gridState.layoutInfo.visibleItemsInfo
+        }.map { visibleItems ->
+            val lastVisibleItemIndex = visibleItems.lastOrNull()?.index
+            val totalItems = gridState.layoutInfo.totalItemsCount
+            Pair(totalItems, lastVisibleItemIndex)
+        }.collect {
+            if (it.first > 0 && it.second != null) {
+                if ((it.second ?: 0) >= it.first - 2) {
+                    if (!landingState.isLoading) {
+                        loadNext()
+                    }
+                }
+            }
+        }
     }
 
     PullToRefreshBox(
@@ -42,7 +63,7 @@ fun LandingScreen(
             state = gridState
         ) {
             itemsIndexed(
-                items = splashState.movieData?.movies.orEmpty(),
+                items = landingState.movieData?.movies.orEmpty(),
             ) { _, item ->
                 key(item.id) {
                     Media(
@@ -61,7 +82,8 @@ fun LandingScreen(
 @Composable
 fun LandingScreenPreview() {
     LandingScreen(
-        splashState = LandingState.initial(),
-        onMediaClicked = {_ ->}
+        landingState = LandingState.initial(),
+        onMediaClicked = {_ ->},
+        loadNext = {}
     )
 }

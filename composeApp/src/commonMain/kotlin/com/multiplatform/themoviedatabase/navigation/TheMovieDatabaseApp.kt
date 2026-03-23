@@ -79,13 +79,14 @@ fun TheMovieDatabaseApp(
                         backStack.remove(Screens.Splash)
                         NavEntry(navKey) {
                             LandingScreen(
-                                splashState = landingViewModel.state,
+                                landingState = landingViewModel.state,
                                 onMediaClicked = { movie ->
 
                                 },
                                 initialConfig = {
                                     landingViewModel.setInitialData(splashViewModel.state.movieData)
-                                }
+                                },
+                                loadNext = { landingViewModel.loadNext() }
                             )
                         }
                     }

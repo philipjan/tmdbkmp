@@ -30,7 +30,7 @@ class LandingReducer(
             state.copy(isPagingLoading = true)
             val result = movieRepository.getMediaLists(
                 endpoint = Endpoint.ENDPOINT_POPULAR,
-                page = if (state.movieData?.movies.isNullOrEmpty()) null else state.movieData.page
+                page = if (state.movieData?.movies.isNullOrEmpty()) null else state.movieData.page?.plus(1)
             )
             state.copy(movieData = result, isPagingLoading = false)
         } catch (e: Exception) {
