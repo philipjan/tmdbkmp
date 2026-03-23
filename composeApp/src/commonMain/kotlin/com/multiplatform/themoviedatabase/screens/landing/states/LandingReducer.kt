@@ -17,10 +17,6 @@ class LandingReducer: Reducer<LandingState, LandingIntent> {
             is LandingIntent.PagingDataAppended -> state.appendMovies(intent)
 
             is LandingIntent.Error -> state.copy(isLoading = false, isPagingLoading = false, error = intent.error)
-
-            // Legacy intents are treated as no-ops
-            is LandingIntent.LoadInitialData -> state
-            is LandingIntent.LoadSucceedingData -> state
         }
     }
 

@@ -17,9 +17,5 @@ sealed interface LandingIntent: Intent {
         val movies: List<Movie>
     ): LandingIntent
 
-    // Legacy intents retained for compatibility (no-ops in reducer)
-    data class LoadInitialData(val initialMovieData: MovieData? = null): LandingIntent
-    data class LoadSucceedingData(val newPage: Int?): LandingIntent
-
     data class Error(val error: Exception?): LandingIntent
 }
