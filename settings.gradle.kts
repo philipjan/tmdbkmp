@@ -33,3 +33,7 @@ plugins {
 }
 
 include(":composeApp")
+include(":utility")
+include(":domain")
+include(":data")
+include(":di")

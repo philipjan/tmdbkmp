@@ -1,3 +1,4 @@
+import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -7,17 +8,20 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 kotlin {
     androidTarget {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     
     listOf(
-        iosArm64(),
+        // temporary disable iosArm64
+        //iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
@@ -37,14 +41,27 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.bundles.androidx.common)
+            implementation(libs.bundles.landscapist.imageloader)
+            implementation(libs.compose.preview.tooling)
+            // modules
+            implementation(projects.utility)
+            implementation(projects.domain)
+            // TODO: refactor in the future and remove data module; inject using Dependency Injection tools
+            implementation(projects.data)
+
+
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -75,8 +92,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -93,5 +110,21 @@ compose.desktop {
             packageName = "com.multiplatform.themoviedatabase"
             packageVersion = "1.0.0"
         }
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom("$projectDir/config/detekt.yml")
+    baseline = file("$projectDir/config/baseline.xml")
+}
+
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required.set(true) // observe findings in your browser with structure and code snippets
+//        checkstyle.required.set(true) // checkstyle(xml) like format mainly for integrations like Jenkins
+        sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
+//        markdown.required.set(true) // simple Markdown format
     }
 }
