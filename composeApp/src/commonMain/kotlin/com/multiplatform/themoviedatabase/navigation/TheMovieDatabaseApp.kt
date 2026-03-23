@@ -93,7 +93,10 @@ fun TheMovieDatabaseApp(
                     }
                     is Screens.MovieDetails -> {
                         NavEntry(navKey) {
-                            DetailsScreen(navKey.movie)
+                            DetailsScreen(
+                                movie = navKey.movie,
+                                onBack = { backStack.removeLastOrNull() }
+                            )
                         }
                     }
                     else -> error("Unknown NavKey ---> $navKey")

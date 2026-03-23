@@ -12,11 +12,11 @@ fun main() = application {
         title = "TheMovieDatabase",
         alwaysOnTop = true
     ) {
-//        App()
+        App()
 //        Media(
 //            sourceUrl = "https://picsum.photos/200/300",
 //            modifier = Modifier
 //        )
-        LoaderHotReloadContainer()
+//        LoaderHotReloadContainer()
     }
 }

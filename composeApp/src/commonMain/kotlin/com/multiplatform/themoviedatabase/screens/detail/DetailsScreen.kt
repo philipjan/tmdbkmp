@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,20 +16,31 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.multiplatform.domain.entity.movie.Movie
+import com.multiplatform.themoviedatabase.getPlatform
 import com.multiplatform.utility.util.Utility.generateImageUrl
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.image.LandscapistImage
@@ -37,17 +49,23 @@ import kotlin.math.roundToInt
 
 @Composable
 fun DetailsScreen(
-    movie: Movie
+    movie: Movie,
+    onBack: (() -> Unit)? = null
 ) {
     val scrollState = rememberScrollState()
+    val isDesktop = remember { getPlatform().name.startsWith("Java") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        // ── Backdrop ────────────────────────────────────────────────────────
-        BackdropSection(backdropPath = movie.backdropPath)
+        // ── Backdrop + overlaid back button ─────────────────────────────────
+        BackdropWithTopBar(
+            backdropPath = movie.backdropPath,
+            showTopBar = isDesktop && onBack != null,
+            onBack = onBack ?: {}
+        )
 
         // ── Poster + Title block ─────────────────────────────────────────────
         Row(
@@ -151,7 +169,11 @@ fun DetailsScreen(
 }
 
 @Composable
-private fun BackdropSection(backdropPath: String?) {
+private fun BackdropWithTopBar(
+    backdropPath: String?,
+    showTopBar: Boolean,
+    onBack: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -164,6 +186,26 @@ private fun BackdropSection(backdropPath: String?) {
                 modifier = Modifier.fillMaxSize(),
                 imageOptions = ImageOptions(contentScale = ContentScale.Crop)
             )
+        }
+
+        if (showTopBar) {
+            // Gradient scrim so the white arrow is always readable over any backdrop
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.45f)
+                    .align(Alignment.TopStart)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Black.copy(alpha = 0.55f),
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
+
+            DetailsTopBar(onBack = onBack)
         }
     }
 }
@@ -219,3 +261,27 @@ private fun StatItem(label: String, value: String) {
         )
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DetailsTopBar(
+    onBack: () -> Unit
+) {
+    TopAppBar(
+        title = {},
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent,
+            navigationIconContentColor = Color.White
+        )
+    )
+}
+
