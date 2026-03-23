@@ -13,9 +13,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
-class MovieRepositoryImpl(private val client: TmdbHttpClient = TmdbHttpClient) : MovieRepository<MovieData> {
+class MovieRepositoryImpl(
+    private val client: TmdbHttpClient = TmdbHttpClient,
+    private val token: String
+) : MovieRepository<MovieData> {
     override suspend fun getMediaLists(endpoint: String, page: Int?) = withContext(Dispatchers.IO) {
-        val result = client.client.get(
+        val result = client.getClient(token).get(
             urlString = endpoint,
             block = {
                 page?.let { pageValue ->

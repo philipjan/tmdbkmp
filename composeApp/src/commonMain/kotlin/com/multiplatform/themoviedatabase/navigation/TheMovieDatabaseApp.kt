@@ -13,6 +13,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.multiplatform.data.repository.MovieRepositoryImpl
+import com.multiplatform.data.tkn
 import com.multiplatform.themoviedatabase.screens.detail.DetailsScreen
 import com.multiplatform.themoviedatabase.screens.landing.LandingScreen
 import com.multiplatform.themoviedatabase.screens.landing.LandingViewModel
@@ -41,7 +42,7 @@ fun TheMovieDatabaseApp(
         elements = listOf(Screens.Splash).toTypedArray()
     )
 
-    val movieRepository = MovieRepositoryImpl()
+    val movieRepository = MovieRepositoryImpl(token = tkn())
 
     // TODO: refactor and inject the repository using D.I
     val splashViewModel: SplashViewModel = viewModel {

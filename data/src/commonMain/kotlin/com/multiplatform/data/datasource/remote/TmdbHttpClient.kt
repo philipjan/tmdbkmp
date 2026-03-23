@@ -29,45 +29,56 @@ object TmdbHttpClient {
         else -> "https://api.themoviedb.org/3/"
     }
 
-    val client = HttpClient(CIO) {
-        install(Auth) {
-            // authentication here
-            bearer {
-                loadTokens {
-                    BearerTokens(
-                        accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwMjgxYWY5Y2VlZThlMTlhYjdhOTliN2YwNTZhMmQ4NiIsIm5iZiI6MTQ5MjQyNjI0Ny4zODUsInN1YiI6IjU4ZjQ5ZTAzOTI1MTQxM2RhNzAyMTdmZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.q0n-3DNnS9fXu1cs_87GIKj7YSKYSInd9Pe5puxpxWI",
-                        refreshToken = null
-                    )
+    private lateinit var client: HttpClient
+
+    fun getClient(token: String): HttpClient {
+        if (!::client.isInitialized) {
+            client = createClient(token)
+        }
+        return client
+    }
+
+    private fun createClient(token: String): HttpClient {
+        return HttpClient(CIO) {
+            install(Auth) {
+                // authentication here
+                bearer {
+                    loadTokens {
+                        BearerTokens(
+                            accessToken = token,
+                            refreshToken = null
+                        )
+                    }
                 }
             }
-        }
 
-        // TODO: not working, fix once available
-        install(Logging) {
-            level = LogLevel.ALL
-        }
-
-        install(ContentNegotiation) {
-            // content negotionation config here
-            json(
-                Json {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                }
-            )
-        }
-
-        engine {
-            endpoint {
-                connectTimeout = 10000
-                connectAttempts = 5
+            // TODO: not working, fix once available
+            install(Logging) {
+                level = LogLevel.ALL
             }
-        }
-        defaultRequest {
-            url(TmdbHttpClient.url.trim())
-            headers.appendIfNameAbsent(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-            headers.appendIfNameAbsent(HttpHeaders.Accept, ContentType.Application.Json.toString())
+
+            install(ContentNegotiation) {
+                // content negotionation config here
+                json(
+                    Json {
+                        prettyPrint = true
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                    }
+                )
+            }
+
+            engine {
+                endpoint {
+                    connectTimeout = 10000
+                    connectAttempts = 5
+                }
+            }
+            defaultRequest {
+                url(TmdbHttpClient.url.trim())
+                headers.appendIfNameAbsent(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                headers.appendIfNameAbsent(HttpHeaders.Accept, ContentType.Application.Json.toString())
+            }
         }
     }
 }
