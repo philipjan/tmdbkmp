@@ -1,58 +1,36 @@
 package com.multiplatform.themoviedatabase.screens.landing.states
 
 import com.multiplatform.domain.entity.movie.MovieData
-import com.multiplatform.domain.repository.MovieRepository
 import com.multiplatform.themoviedatabase.component.Reducer
-import com.multiplatform.utility.util.Constants
-import com.multiplatform.utility.util.Endpoint
 
-class LandingReducer(
-    private val movieRepository: MovieRepository<MovieData>
-): Reducer<LandingState, LandingIntent> {
+class LandingReducer: Reducer<LandingState, LandingIntent> {
 
     override suspend fun reduce(
         state: LandingState,
         intent: LandingIntent
     ): LandingState {
         return when(intent) {
-            is LandingIntent.LoadInitialData -> {
-                loadInitialData(initialData = intent.initialMovieData, state = state)
-            }
+            is LandingIntent.InitialLoadingChanged -> state.copy(isLoading = intent.isLoading, error = null)
+            is LandingIntent.InitialDataLoaded -> state.copy(movieData = intent.movieData, isLoading = false, error = null)
 
-            is LandingIntent.LoadSucceedingData -> {
-                loadSucceedingData(state)
-            }
+            is LandingIntent.PagingLoadingChanged -> state.copy(isPagingLoading = intent.isLoading, error = null)
+            is LandingIntent.PagingDataAppended -> state.appendMovies(intent)
+
+            is LandingIntent.Error -> state.copy(isLoading = false, isPagingLoading = false, error = intent.error)
+
+            // Legacy intents are treated as no-ops
+            is LandingIntent.LoadInitialData -> state
+            is LandingIntent.LoadSucceedingData -> state
         }
     }
 
-    private suspend fun loadSucceedingData(state: LandingState): LandingState {
-        return try {
-            state.copy(isPagingLoading = true)
-            val result = movieRepository.getMediaLists(
-                endpoint = Endpoint.ENDPOINT_POPULAR,
-                page = if (state.movieData?.movies.isNullOrEmpty()) null else state.movieData.page?.plus(1)
-            )
-            state.copy(movieData = result, isPagingLoading = false)
-        } catch (e: Exception) {
-            state.copy(isPagingLoading = false, error = e)
-        }
-    }
-
-    private suspend fun loadInitialData(initialData: MovieData?, state: LandingState): LandingState {
-        return try {
-            state.copy(isLoading = true)
-            if (initialData != null) {
-                state.copy(movieData = initialData, isLoading = false)
-            } else {
-                val result = movieRepository.getMediaLists(
-                    endpoint = Endpoint.ENDPOINT_POPULAR,
-                    // initial data, so first page
-                    page = Constants.INITIAL_PAGE
-                )
-                state.copy(movieData = result, isLoading = false)
-            }
-        } catch (e: Exception) {
-            state.copy(isLoading = false, error = e)
-        }
+    private fun LandingState.appendMovies(intent: LandingIntent.PagingDataAppended): LandingState {
+        val updatedMovies = movieData?.movies.orEmpty() + intent.movies
+        val updatedMovieData = MovieData(
+            page = intent.page ?: movieData?.page,
+            totalPages = intent.totalPages ?: movieData?.totalPages,
+            movies = updatedMovies
+        )
+        return copy(movieData = updatedMovieData, isPagingLoading = false, error = null)
     }
 }

@@ -1,24 +1,30 @@
 package com.multiplatform.themoviedatabase.screens.landing
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.key
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.multiplatform.domain.entity.movie.Movie
 import com.multiplatform.themoviedatabase.component.Media
 import com.multiplatform.themoviedatabase.screens.landing.states.LandingState
 import com.multiplatform.utility.util.Utility.generateImageUrl
-import kotlinx.coroutines.flow.map
 
 @Composable
 fun LandingScreen(
@@ -29,32 +35,30 @@ fun LandingScreen(
 ) {
     val gridState = rememberLazyGridState()
     val pullToRefreshState = rememberPullToRefreshState()
-    val isLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         initialConfig?.invoke()
     }
 
-    LaunchedEffect(gridState) {
-        snapshotFlow {
-            gridState.layoutInfo.visibleItemsInfo
-        }.map { visibleItems ->
-            val lastVisibleItemIndex = visibleItems.lastOrNull()?.index
-            val totalItems = gridState.layoutInfo.totalItemsCount
-            Pair(totalItems, lastVisibleItemIndex)
-        }.collect {
-            if (it.first > 0 && it.second != null) {
-                if ((it.second ?: 0) >= it.first - 2) {
-                    if (!landingState.isLoading) {
-                        loadNext()
-                    }
-                }
-            }
+    // derivedStateOf limits recomposition: only updates when the boolean result changes,
+    // not on every scroll offset tick — avoids the snapshotFlow overhead.
+    val reachedBottom by remember {
+        derivedStateOf {
+            val layoutInfo = gridState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            totalItems > 0 && lastVisibleIndex >= totalItems - 3
+        }
+    }
+
+    LaunchedEffect(reachedBottom) {
+        if (reachedBottom && !landingState.isLoading && !landingState.isPagingLoading) {
+            loadNext()
         }
     }
 
     PullToRefreshBox(
-        isRefreshing = isLoading,
+        isRefreshing = landingState.isLoading,
         onRefresh = {},
         state = pullToRefreshState
     ) {
@@ -72,6 +76,19 @@ fun LandingScreen(
                             onMediaClicked(item)
                         }
                     )
+                }
+            }
+
+            if (landingState.isPagingLoading) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }

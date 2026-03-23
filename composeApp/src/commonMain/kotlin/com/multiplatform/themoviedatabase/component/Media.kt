@@ -2,13 +2,16 @@ package com.multiplatform.themoviedatabase.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.image.LandscapistImage
 
 @Composable
@@ -19,9 +22,13 @@ fun Media(
 ) {
     LandscapistImage(
         imageModel = { sourceUrl },
+        // fillMaxWidth + aspectRatio gives Coil a concrete bounded size on every call,
+        // preventing unbounded decode requests that cause "Image decoding logging dropped!"
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .aspectRatio(2f / 3f)
             .clickable(onClick = onClicked),
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         loading = {
             Box(
                 contentAlignment = Alignment.Center
