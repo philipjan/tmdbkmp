@@ -21,9 +21,9 @@ kotlinStdlib = "2.3.20"
 runner = "1.7.0"
 core = "1.7.0"
 kotlinx-serialization = "2.3.20"
-kotlinxSerializationJson = "1.10.0"
-ktor = "3.4.1"
-landscapist = "2.9.5"
+kotlinxSerializationJson = "1.11.0"
+ktor = "3.4.2"
+landscapist = "2.9.6"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
