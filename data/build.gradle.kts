@@ -75,6 +75,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.ktor.client.mock)
             }
         }
 
@@ -83,7 +84,6 @@ kotlin {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlin.testJunit)
                 implementation(libs.kotlinx.coroutines.test)
-                implementation(libs.ktor.client.mock)
             }
         }
 

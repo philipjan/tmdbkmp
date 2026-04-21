@@ -11,10 +11,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -23,15 +21,21 @@ import kotlin.test.assertTrue
 /**
  * Unit tests for [MovieRepositoryImpl].
  *
- * [TmdbHttpClient] is a singleton holding a private lazy `HttpClient`. A JVM reflection
- * helper resets that field before each test so each test drives its own [MockEngine],
- * keeping tests fully isolated with zero real network I/O.
+ * A [FakeTmdbHttpClient] wrapping a [MockEngine] is injected directly into the
+ * [MovieRepositoryImpl] constructor, keeping tests fully isolated with zero real
+ * network I/O and no JVM-specific reflection.
  */
 class MovieRepositoryImplTest {
 
-    private val testToken = "test-bearer-token"
-
     // ── helpers ──────────────────────────────────────────────────────────────
+
+    /**
+     * Test-only [TmdbHttpClient] implementation that delegates to a pre-configured
+     * [HttpClient] backed by a [MockEngine].
+     */
+    private class FakeTmdbHttpClient(private val httpClient: HttpClient) : TmdbHttpClient {
+        override fun getClient(): HttpClient = httpClient
+    }
 
     /**
      * Builds an [HttpClient] backed by [engine] with the same JSON config used in
@@ -47,30 +51,8 @@ class MovieRepositoryImplTest {
         }
     }
 
-    /**
-     * Uses JVM reflection to overwrite the private `client` field inside the
-     * [TmdbHttpClient] singleton so that [MovieRepositoryImpl] calls our mock engine.
-     */
-    private fun injectMockClient(httpClient: HttpClient) {
-        val field = TmdbHttpClient::class.java.getDeclaredField("client")
-        field.isAccessible = true
-        field.set(TmdbHttpClient, httpClient)
-    }
-
-    /** Resets the `client` lateinit field so the next test starts from a clean state. */
-    private fun resetTmdbClient() {
-        val field = TmdbHttpClient::class.java.getDeclaredField("client")
-        field.isAccessible = true
-        // Reassign to null via reflection — Kotlin's lateinit backing is a nullable Object slot
-        @Suppress("UNCHECKED_CAST")
-        (field as java.lang.reflect.Field).set(TmdbHttpClient, null)
-    }
-
-    @BeforeTest
-    fun setUp() = resetTmdbClient()
-
-    @AfterTest
-    fun tearDown() = resetTmdbClient()
+    private fun repoWith(engine: MockEngine): MovieRepositoryImpl =
+        MovieRepositoryImpl(client = FakeTmdbHttpClient(mockHttpClient(engine)))
 
     // ── test fixtures ─────────────────────────────────────────────────────────
 
@@ -124,16 +106,16 @@ class MovieRepositoryImplTest {
     // ── getMediaLists – happy path ────────────────────────────────────────────
 
     @Test
-    fun getMediaLists_withValidEndpoint_returnsCorrectlyMappedMovieData() = runBlocking {
-        // Arrange
-        val engine = MockEngine { respond(movieListJson(), HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())) }
-        injectMockClient(mockHttpClient(engine))
-        val repo = MovieRepositoryImpl(token = testToken)
+    fun getMediaLists_withValidEndpoint_returnsCorrectlyMappedMovieData() = runTest {
+        val engine = MockEngine {
+            respond(
+                movieListJson(),
+                HttpStatusCode.OK,
+                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            )
+        }
+        val result = repoWith(engine).getMediaLists(endpoint = "movie/popular", page = null)
 
-        // Act
-        val result = repo.getMediaLists(endpoint = "movie/popular", page = null)
-
-        // Assert
         assertEquals(1, result.page)
         assertEquals(10, result.totalPages)
         assertEquals(1, result.movies.size)
@@ -156,20 +138,18 @@ class MovieRepositoryImplTest {
     }
 
     @Test
-    fun getMediaLists_withPageProvided_appendsPageQueryParameter() = runBlocking {
-        // Arrange
+    fun getMediaLists_withPageProvided_appendsPageQueryParameter() = runTest {
         var capturedUrl = ""
         val engine = MockEngine { request ->
             capturedUrl = request.url.toString()
-            respond(movieListJson(page = 2), HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()))
+            respond(
+                movieListJson(page = 2),
+                HttpStatusCode.OK,
+                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            )
         }
-        injectMockClient(mockHttpClient(engine))
-        val repo = MovieRepositoryImpl(token = testToken)
+        val result = repoWith(engine).getMediaLists(endpoint = "movie/popular", page = 2)
 
-        // Act
-        val result = repo.getMediaLists(endpoint = "movie/popular", page = 2)
-
-        // Assert
         assertTrue(
             capturedUrl.contains("${QueryParams.QUERY_PARAM_PAGE}=2"),
             "Expected URL to contain page=2 but was: $capturedUrl"
@@ -178,20 +158,18 @@ class MovieRepositoryImplTest {
     }
 
     @Test
-    fun getMediaLists_withNullPage_omitsPageQueryParameter() = runBlocking {
-        // Arrange
+    fun getMediaLists_withNullPage_omitsPageQueryParameter() = runTest {
         var capturedUrl = ""
         val engine = MockEngine { request ->
             capturedUrl = request.url.toString()
-            respond(movieListJson(), HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()))
+            respond(
+                movieListJson(),
+                HttpStatusCode.OK,
+                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            )
         }
-        injectMockClient(mockHttpClient(engine))
-        val repo = MovieRepositoryImpl(token = testToken)
+        repoWith(engine).getMediaLists(endpoint = "movie/popular", page = null)
 
-        // Act
-        repo.getMediaLists(endpoint = "movie/popular", page = null)
-
-        // Assert
         assertTrue(
             !capturedUrl.contains(QueryParams.QUERY_PARAM_PAGE),
             "Expected URL to NOT contain 'page' param but was: $capturedUrl"
@@ -201,63 +179,58 @@ class MovieRepositoryImplTest {
     // ── getMediaLists – edge cases ────────────────────────────────────────────
 
     @Test
-    fun getMediaLists_withEmptyResults_returnsEmptyMovieList() = runBlocking {
-        // Arrange
-        val engine = MockEngine { respond(emptyListJson(), HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())) }
-        injectMockClient(mockHttpClient(engine))
-        val repo = MovieRepositoryImpl(token = testToken)
+    fun getMediaLists_withEmptyResults_returnsEmptyMovieList() = runTest {
+        val engine = MockEngine {
+            respond(
+                emptyListJson(),
+                HttpStatusCode.OK,
+                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            )
+        }
+        val result = repoWith(engine).getMediaLists(endpoint = "movie/popular", page = null)
 
-        // Act
-        val result = repo.getMediaLists(endpoint = "movie/popular", page = null)
-
-        // Assert
         assertTrue(result.movies.isEmpty())
         assertEquals(0, result.totalPages)
     }
 
     @Test
-    fun getMediaLists_withMissingResultsKey_returnsEmptyMovieList() = runBlocking {
-        // Arrange
-        val engine = MockEngine { respond(nullResultsJson(), HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())) }
-        injectMockClient(mockHttpClient(engine))
-        val repo = MovieRepositoryImpl(token = testToken)
+    fun getMediaLists_withMissingResultsKey_returnsEmptyMovieList() = runTest {
+        val engine = MockEngine {
+            respond(
+                nullResultsJson(),
+                HttpStatusCode.OK,
+                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            )
+        }
+        val result = repoWith(engine).getMediaLists(endpoint = "movie/popular", page = null)
 
-        // Act
-        val result = repo.getMediaLists(endpoint = "movie/popular", page = null)
-
-        // Assert
         assertTrue(result.movies.isEmpty())
     }
 
     @Test
-    fun getMediaLists_withMultiplePages_returnsCorrectPageMetadata() = runBlocking {
-        // Arrange
-        val engine = MockEngine { respond(movieListJson(page = 3, totalPages = 20, totalResults = 400), HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())) }
-        injectMockClient(mockHttpClient(engine))
-        val repo = MovieRepositoryImpl(token = testToken)
+    fun getMediaLists_withMultiplePages_returnsCorrectPageMetadata() = runTest {
+        val engine = MockEngine {
+            respond(
+                movieListJson(page = 3, totalPages = 20, totalResults = 400),
+                HttpStatusCode.OK,
+                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            )
+        }
+        val result = repoWith(engine).getMediaLists(endpoint = "movie/top_rated", page = 3)
 
-        // Act
-        val result = repo.getMediaLists(endpoint = "movie/top_rated", page = 3)
-
-        // Assert
         assertEquals(3, result.page)
         assertEquals(20, result.totalPages)
     }
 
     @Test
-    fun getMediaLists_onServerError_throwsException() = runBlocking {
-        // Arrange
-        val engine = MockEngine { respond("Internal Server Error", HttpStatusCode.InternalServerError) }
-        injectMockClient(mockHttpClient(engine))
-        val repo = MovieRepositoryImpl(token = testToken)
-
-        // Act & Assert
+    fun getMediaLists_onServerError_throwsException() = runTest {
+        val engine = MockEngine {
+            respond("Internal Server Error", HttpStatusCode.InternalServerError)
+        }
         val thrown = assertFailsWith<Exception> {
-            repo.getMediaLists(endpoint = "movie/popular", page = null)
+            repoWith(engine).getMediaLists(endpoint = "movie/popular", page = null)
         }
         assertTrue(thrown.message?.isNotBlank() ?: true)
-        Unit
     }
 }
-
 
