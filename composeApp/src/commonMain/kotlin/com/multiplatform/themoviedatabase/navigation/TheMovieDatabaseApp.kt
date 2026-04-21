@@ -51,7 +51,7 @@ fun TheMovieDatabaseApp(
             initialState = SplashState.initial()
         )
     }
-
+    // TODO:  refactor and inject the repository using D.I
     val landingViewModel: LandingViewModel = viewModel {
         LandingViewModel(
             movieRepository = movieRepository,
