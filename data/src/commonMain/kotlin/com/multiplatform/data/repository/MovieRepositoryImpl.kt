@@ -14,11 +14,10 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 class MovieRepositoryImpl(
-    private val client: TmdbHttpClient = TmdbHttpClient,
-    private val token: String
+    private val client: TmdbHttpClient
 ) : MovieRepository<MovieData> {
     override suspend fun getMediaLists(endpoint: String, page: Int?) = withContext(Dispatchers.IO) {
-        val result = client.getClient(token).get(
+        val result = client.getClient().get(
             urlString = endpoint,
             block = {
                 page?.let { pageValue ->

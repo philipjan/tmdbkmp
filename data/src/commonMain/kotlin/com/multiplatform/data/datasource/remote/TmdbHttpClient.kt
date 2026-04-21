@@ -21,19 +21,23 @@ sealed class Environment {
     object Dev: Environment()
 }
 
-object TmdbHttpClient {
+interface TmdbHttpClient {
+    fun getClient(): HttpClient
+}
+
+class ITmdbHttpClient(val tkn: String) : TmdbHttpClient {
 
     private var env: Environment = Environment.Dev
-    private var url: String = when(env) {
+    private var urlValue: String = when(env) {
         Environment.Dev -> "https://api.themoviedb.org/3/"
         else -> "https://api.themoviedb.org/3/"
     }
 
     private lateinit var client: HttpClient
 
-    fun getClient(token: String): HttpClient {
+    override fun getClient(): HttpClient {
         if (!::client.isInitialized) {
-            client = createClient(token)
+            client = createClient(tkn)
         }
         return client
     }
@@ -75,7 +79,7 @@ object TmdbHttpClient {
                 }
             }
             defaultRequest {
-                url(TmdbHttpClient.url.trim())
+                url(urlValue.trim())
                 headers.appendIfNameAbsent(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 headers.appendIfNameAbsent(HttpHeaders.Accept, ContentType.Application.Json.toString())
             }
