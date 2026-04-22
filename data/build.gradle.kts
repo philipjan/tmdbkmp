@@ -3,9 +3,13 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.androidLint)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
 
     // Target declarations - add or remove as needed below. These define
     // which platforms this KMP module supports.
@@ -65,6 +69,7 @@ kotlin {
                 implementation(libs.kotlin.stdlib)
                 implementation(libs.bundles.ktor.client.common)
                 implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.bundles.sqldelight.common)
                 // module
                 implementation(projects.domain)
                 implementation(projects.utility)
@@ -87,13 +92,17 @@ kotlin {
             }
         }
 
+        jvmMain {
+            dependencies {
+                implementation(libs.sqldelight.driver.sqlite)
+            }
+        }
+
         androidMain {
             dependencies {
-                // Add Android-specific dependencies here. Note that this source set depends on
-                // commonMain by default and will correctly pull the Android artifacts of any KMP
-                // dependencies declared in commonMain.
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.kotlinx.coroutines.android)
+                implementation(libs.sqldelight.driver.android)
             }
         }
 
@@ -107,14 +116,18 @@ kotlin {
 
         iosMain {
             dependencies {
-                // Add iOS-specific dependencies here. This a source set created by Kotlin Gradle
-                // Plugin (KGP) that each specific iOS target (e.g., iosX64) depends on as
-                // part of KMP’s default source set hierarchy. Note that this source set depends
-                // on common by default and will correctly pull the iOS artifacts of any
-                // KMP dependencies declared in commonMain.
                 implementation(libs.ktor.client.darwin)
+                implementation(libs.sqldelight.driver.native)
             }
         }
     }
 
+}
+
+sqldelight {
+    databases {
+        create("AppDatabase") {
+            packageName.set("com.multiplatform.data.db")
+        }
+    }
 }

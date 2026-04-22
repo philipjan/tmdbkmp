@@ -10,7 +10,7 @@ open class BaseMedia(
     @SerialName("backdrop_path")
     open val backdropPath: String? = null,
     @SerialName("genre_ids")
-    open val genreIds: List<Int?>? = null,
+    open val genreIds: List<Int>? = null,
     @SerialName("id")
     open val id: Int? = null,
     @SerialName("original_language")

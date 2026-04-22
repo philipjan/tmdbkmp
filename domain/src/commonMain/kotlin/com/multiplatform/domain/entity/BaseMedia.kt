@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 open class BaseMedia(
     open var adult: Boolean? = null,
     open var backdropPath: String? = null,
-    open var genreIds: List<Int?>? = null,
+    open var genreIds: List<Int>? = null,
     open var id: Int? = null,
     open var originalLanguage: String? = null,
     open var overview: String? = null,

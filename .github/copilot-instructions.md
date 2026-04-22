@@ -230,6 +230,11 @@ utility
 
 ---
 
+### 7.5 Local Database
+
+**`data/src/commonMain/sqldelight/com/multiplatform/data/db/`**
+- contains all SQLDelight-generated database code, including the `TmdbDatabase` class and related DAOs.
+
 ## 8. Known TODOs & Improvement Areas
 
 | Location | Note |

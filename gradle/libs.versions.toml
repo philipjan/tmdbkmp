@@ -24,6 +24,7 @@ kotlinx-serialization = "2.3.20"
 kotlinxSerializationJson = "1.11.0"
 ktor = "3.4.2"
 landscapist = "2.9.6"
+sqldelight = "2.3.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -66,6 +67,14 @@ landscapist-image = { module = "com.github.skydoves:landscapist-image", version.
 landscapist-core = { module = "com.github.skydoves:landscapist-core", version.ref = "landscapist" }
 landscapist-placeholder = { module = "com.github.skydoves:landscapist-placeholder", version.ref = "landscapist" }
 
+sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
+sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
+sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+#sqldelight-driver-jdbc-sqlite = { module = "app.cash.sqldelight:jdbc-sqlite-driver", version.ref = "sqldelight" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
@@ -77,8 +86,10 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 
 [bundles]
 androidx-common = ["androidx-lifecycle-viewmodelCompose", "androidx-lifecycle-runtimeCompose", "compose-navigation3", "compose-navigation3-viewmodel", "jetbrains-lifecycle-viewmodelCompose"]
 ktor-client-common = [ "ktor-client-core", "ktor-client-engine-cio", "ktor-client-content-negotiation", "ktor-client-kotlinx-json", "ktor-client-kotlinx-auth", "ktor-client-kotlinx-logging"]
 landscapist-imageloader = ["landscapist-core", "landscapist-image", "landscapist-placeholder"]
+sqldelight-common = ["sqldelight-runtime", "sqldelight-coroutines", "sqldelight-primitive-adapters"]

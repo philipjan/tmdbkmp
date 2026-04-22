@@ -1,0 +1,85 @@
+-- MovieEntity: mirrors Movie (domain) + BaseMedia fields.
+-- genreIds stored as comma-separated TEXT; decoded via ColumnAdapter in data layer.
+CREATE TABLE IF NOT EXISTS MovieEntity (
+    id               INTEGER NOT NULL PRIMARY KEY,  -- BaseMedia.id
+    adult            INTEGER NOT NULL DEFAULT 0,    -- BaseMedia.adult      (0 = false, 1 = true)
+    backdropPath     TEXT,                           -- BaseMedia.backdropPath
+    genreIds         TEXT AS kotlin.collections.List<kotlin.Int>,  -- BaseMedia.genreIds (decoded via GenreIdsAdapter)
+    originalLanguage TEXT,                           -- BaseMedia.originalLanguage
+    overview         TEXT,                           -- BaseMedia.overview
+    popularity       REAL    NOT NULL DEFAULT 0.0,  -- BaseMedia.popularity
+    posterPath       TEXT,                           -- BaseMedia.posterPath
+    voteAverage      REAL    NOT NULL DEFAULT 0.0,  -- BaseMedia.voteAverage
+    voteCount        INTEGER NOT NULL DEFAULT 0,    -- BaseMedia.voteCount
+    originalTitle    TEXT,                           -- Movie.originalTitle
+    releaseDate      TEXT,                           -- Movie.releaseDate
+    title            TEXT,                           -- Movie.title
+    video            INTEGER NOT NULL DEFAULT 0,    -- Movie.video          (0 = false, 1 = true)
+    page             INTEGER NOT NULL DEFAULT 1     -- pagination metadata
+);
+
+CREATE INDEX IF NOT EXISTS idx_movie_page ON MovieEntity(page);
+
+-- ─── Queries ────────────────────────────────────────────────────────────────
+
+selectAll:
+SELECT *
+FROM MovieEntity
+ORDER BY popularity DESC;
+
+selectByPage:
+SELECT *
+FROM MovieEntity
+WHERE page = :page
+ORDER BY popularity DESC;
+
+selectById:
+SELECT *
+FROM MovieEntity
+WHERE id = :id
+LIMIT 1;
+
+-- ─── Mutations ──────────────────────────────────────────────────────────────
+
+upsert:
+INSERT OR REPLACE INTO MovieEntity(
+    id,
+    adult,
+    backdropPath,
+    genreIds,
+    originalLanguage,
+    overview,
+    popularity,
+    posterPath,
+    voteAverage,
+    voteCount,
+    originalTitle,
+    releaseDate,
+    title,
+    video,
+    page
+) VALUES (
+    :id,
+    :adult,
+    :backdropPath,
+    :genreIds,
+    :originalLanguage,
+    :overview,
+    :popularity,
+    :posterPath,
+    :voteAverage,
+    :voteCount,
+    :originalTitle,
+    :releaseDate,
+    :title,
+    :video,
+    :page
+);
+
+deleteByPage:
+DELETE FROM MovieEntity
+WHERE page = :page;
+
+deleteAll:
+DELETE FROM MovieEntity;
+
