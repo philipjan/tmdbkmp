@@ -65,3 +65,4 @@ Carthage/Build/
 # Other
 gradle.properties.local
 # Add any other sensitive files or local configurations here
+.github/
