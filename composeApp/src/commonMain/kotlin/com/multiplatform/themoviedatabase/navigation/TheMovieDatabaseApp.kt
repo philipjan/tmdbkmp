@@ -12,6 +12,9 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import androidx.compose.runtime.remember
+import com.multiplatform.data.datasource.local.DatabaseDriverFactory
+import com.multiplatform.data.datasource.local.createAppDatabase // extension fun — resolved after Gradle sync
 import com.multiplatform.data.datasource.remote.ITmdbHttpClient
 import com.multiplatform.data.repository.MovieRepositoryImpl
 import com.multiplatform.data.tkn
@@ -28,6 +31,7 @@ import kotlinx.serialization.modules.polymorphic
 
 @Composable
 fun TheMovieDatabaseApp(
+    driverFactory: DatabaseDriverFactory,
     modifier: Modifier = Modifier
 ) {
     val backStack = rememberNavBackStack(
@@ -43,9 +47,12 @@ fun TheMovieDatabaseApp(
         elements = listOf(Screens.Splash).toTypedArray()
     )
 
-    val movieRepository = MovieRepositoryImpl(
-        client = ITmdbHttpClient(tkn())
-    )
+    val movieRepository = remember(driverFactory) {
+        MovieRepositoryImpl(
+            client = ITmdbHttpClient(tkn()),
+            database = driverFactory.createAppDatabase()
+        )
+    }
 
     // TODO: refactor and inject the repository using D.I
     val splashViewModel: SplashViewModel = viewModel {

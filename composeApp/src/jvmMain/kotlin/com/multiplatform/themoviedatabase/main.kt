@@ -1,10 +1,8 @@
 package com.multiplatform.themoviedatabase
 
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.multiplatform.themoviedatabase.component.LoaderHotReloadContainer
-import com.multiplatform.themoviedatabase.component.Media
+import com.multiplatform.data.datasource.local.DatabaseDriverFactory
 
 fun main() = application {
     Window(
@@ -12,11 +10,6 @@ fun main() = application {
         title = "TheMovieDatabase",
         alwaysOnTop = true
     ) {
-        App()
-//        Media(
-//            sourceUrl = "https://picsum.photos/200/300",
-//            modifier = Modifier
-//        )
-//        LoaderHotReloadContainer()
+        App(driverFactory = DatabaseDriverFactory())
     }
 }

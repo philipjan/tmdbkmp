@@ -7,14 +7,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import com.multiplatform.data.datasource.local.DatabaseDriverFactory
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.enableEdgeToEdge(window)
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = true
         super.onCreate(savedInstanceState)
+        val driverFactory = DatabaseDriverFactory(applicationContext)
         setContent {
-            App()
+            App(driverFactory = driverFactory)
         }
     }
 }
@@ -22,5 +27,6 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    App()
+    val context: Context = LocalContext.current
+    App(driverFactory = DatabaseDriverFactory(context))
 }

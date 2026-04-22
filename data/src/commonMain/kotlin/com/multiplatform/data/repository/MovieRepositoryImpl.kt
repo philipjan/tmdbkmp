@@ -1,6 +1,7 @@
 package com.multiplatform.data.repository
 
 import com.multiplatform.data.datasource.remote.TmdbHttpClient
+import com.multiplatform.data.db.AppDatabase
 import com.multiplatform.data.model.Movie
 import com.multiplatform.data.model.base.BaseListResponse
 import com.multiplatform.data.model.mapper.MovieMapper
@@ -14,7 +15,8 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 class MovieRepositoryImpl(
-    private val client: TmdbHttpClient
+    private val client: TmdbHttpClient,
+    private val database: AppDatabase, // TODO: add proper offline first implementation.
 ) : MovieRepository<MovieData> {
     override suspend fun getMediaLists(endpoint: String, page: Int?) = withContext(Dispatchers.IO) {
         val result = client.getClient().get(
