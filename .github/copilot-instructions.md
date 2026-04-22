@@ -185,7 +185,52 @@ utility
 
 ---
 
-## 7. Known TODOs & Improvement Areas
+## 7. Testing
+
+### 7.1 Tech Stack
+
+| Library | Role | Scope |
+|---|---|---|
+| `kotlin-test` | Multiplatform assertions (`assertEquals`, `assertNull`, `assertTrue`, …) | All modules — `commonTest` |
+| `kotlinx-coroutines-test` | `runTest`, `StandardTestDispatcher`, `advanceUntilIdle` | `composeApp`, `data` — `commonTest` / `jvmTest` |
+| `ktor-client-mock` | `MockEngine` for zero-network HTTP testing | `data` — `commonTest` |
+| `kotlin-test-junit` | JUnit 4 runner bridge for JVM test targets | `data` — `jvmTest` |
+| `androidx.test.ext:junit` | JUnit instrumented test runner | `data` — `androidDeviceTest` |
+| `androidx.test:runner` + `core` | Android instrumentation support | `data` — `androidDeviceTest` |
+
+### 7.2 Test Directories
+
+| Path | Source set | What lives here |
+|---|---|---|
+| `composeApp/src/commonTest/` | `commonTest` | ViewModel, Reducer, and integration tests shared across all targets |
+| `data/src/commonTest/` | `commonTest` | Repository and mapper unit tests using a Ktor `MockEngine` |
+| `data/src/jvmTest/` | `jvmTest` | JVM-specific test runner wiring with JUnit 4 bridge |
+| `data/src/androidHostTest/` | `androidHostTest` | Host-side (JVM) Android unit test stubs |
+| `data/src/androidDeviceTest/` | `androidDeviceTest` | On-device instrumented test stubs |
+| `domain/src/androidHostTest/` | `androidHostTest` | Host-side unit test stubs |
+| `domain/src/androidDeviceTest/` | `androidDeviceTest` | On-device instrumented test stubs |
+| `di/src/androidHostTest/` | `androidHostTest` | Placeholder — no bindings to test yet |
+| `utility/src/androidHostTest/` | `androidHostTest` | Placeholder — utility module host-side stubs |
+
+### 7.3 Test Coverage by Module
+
+**`composeApp/src/commonTest/`**
+- Focuses on MVI correctness. ViewModel tests validate state transitions triggered by `Intent` dispatch — covering init auto-load, success/error paths, and call-count expectations using a `StandardTestDispatcher`. Reducer tests are pure and synchronous, asserting that `reduce(state, intent)` produces the correct next state for happy path, error path, edge cases (empty list, null page), and unimplemented intent stubs.
+
+**`data/src/commonTest/`**
+- Focuses on infrastructure correctness. Repository tests verify end-to-end HTTP → mapping → domain entity flow using a `MockEngine`-backed fake client, covering page query param handling, empty/missing results, multi-page metadata, and server error propagation. Mapper tests assert domain mapping fidelity for full responses, multiple items, null inputs, and graceful null-field handling.
+
+### 7.4 Testing Patterns
+
+- **Fake objects over mocking frameworks** — Tests use hand-written `FakeMovieRepository` / `FakeTmdbHttpClient` implementations; no Mockk or Mockito dependency.
+- **`StandardTestDispatcher` + `advanceUntilIdle()`** — ViewModel tests control coroutine execution explicitly, avoiding flaky timing.
+- **`MockEngine` for HTTP** — `MovieRepositoryImplTest` never touches the network; all HTTP responses are injected via Ktor's `MockEngine`.
+- **Arrange / Act / Assert** — All test bodies follow the three-section comment pattern for readability.
+- **`@BeforeTest` / `@AfterTest`** — `Dispatchers.setMain` / `resetMain` in ViewModel tests ensures `Main` dispatcher is always restored.
+
+---
+
+## 8. Known TODOs & Improvement Areas
 
 | Location | Note |
 |---|---|
