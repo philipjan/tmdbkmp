@@ -1,6 +1,7 @@
 package com.multiplatform.data.model.mapper
 
 import com.multiplatform.data.db.MovieEntity
+import com.multiplatform.data.db.MovieQueries
 import com.multiplatform.domain.entity.movie.Movie
 
 // ─── MovieEntity → domain Movie ─────────────────────────────────────────────
@@ -48,6 +49,27 @@ internal fun Movie.toEntity(page: Int): MovieEntity =
     )
 
 internal fun List<Movie>.toEntity(page: Int): List<MovieEntity> = map { it.toEntity(page) }
+
+// ─── MovieQueries convenience upsert ────────────────────────────────────────
+
+/** Upserts a fully-constructed [MovieEntity] without spreading all fields at the call site. */
+internal fun MovieQueries.upsert(entity: MovieEntity) = upsert(
+    id = entity.id,
+    adult = entity.adult,
+    backdropPath = entity.backdropPath,
+    genreIds = entity.genreIds,
+    originalLanguage = entity.originalLanguage,
+    overview = entity.overview,
+    popularity = entity.popularity,
+    posterPath = entity.posterPath,
+    voteAverage = entity.voteAverage,
+    voteCount = entity.voteCount,
+    originalTitle = entity.originalTitle,
+    releaseDate = entity.releaseDate,
+    title = entity.title,
+    video = entity.video,
+    page = entity.page,
+)
 
 // ─── Boolean ↔ Long helpers ──────────────────────────────────────────────────
 

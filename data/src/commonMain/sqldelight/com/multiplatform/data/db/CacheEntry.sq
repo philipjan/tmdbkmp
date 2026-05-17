@@ -1,0 +1,24 @@
+-- CacheEntry: stores per-request cache metadata (endpoint + page → timestamp + pagination info).
+-- Used by the offline-first layer to decide whether a cached page is still fresh.
+CREATE TABLE IF NOT EXISTS CacheEntry (
+    cacheKey   TEXT    NOT NULL PRIMARY KEY,  -- "${endpoint}|${page}"
+    cachedAt   INTEGER NOT NULL,              -- epoch millis of the last successful network fetch
+    totalPages INTEGER                        -- total page count returned by the API (nullable)
+);
+
+-- ─── Queries ────────────────────────────────────────────────────────────────
+
+selectByCacheKey:
+SELECT *
+FROM CacheEntry
+WHERE cacheKey = :cacheKey;
+
+-- ─── Mutations ──────────────────────────────────────────────────────────────
+
+upsert:
+INSERT OR REPLACE INTO CacheEntry(cacheKey, cachedAt, totalPages)
+VALUES (:cacheKey, :cachedAt, :totalPages);
+
+deleteAll:
+DELETE FROM CacheEntry;
+
