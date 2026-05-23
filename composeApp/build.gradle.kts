@@ -104,7 +104,10 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "com.multiplatform.themoviedatabase.MainKt"
-
+        jvmArgs += listOf(
+            "-Dsun.java2d.opengl=true",
+            "Xmx2048m"
+        )
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.multiplatform.themoviedatabase"
