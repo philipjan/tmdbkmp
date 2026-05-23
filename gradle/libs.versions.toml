@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.2"
+agp = "9.0.1"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
@@ -17,7 +17,7 @@ junit = "4.13.2"
 kotlin = "2.3.21"
 kotlinx-coroutines = "1.11.0"
 detekt = "1.23.8"
-kotlinStdlib = "2.3.20"
+kotlinStdlib = "2.3.21"
 runner = "1.7.0"
 core = "1.7.0"
 kotlinx-serialization = "2.3.21"
@@ -25,6 +25,8 @@ kotlinxSerializationJson = "1.11.0"
 ktor = "3.5.0"
 landscapist = "2.9.7"
 sqldelight = "2.3.2"
+lifecycleRuntimeKtx = "2.10.0"
+composeBom = "2024.09.00"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -73,6 +75,15 @@ sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapte
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-driver-sqlite = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -86,6 +97,7 @@ androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.lib
 androidLint = { id = "com.android.lint", version.ref = "agp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
 [bundles]
 androidx-common = ["androidx-lifecycle-viewmodelCompose", "androidx-lifecycle-runtimeCompose", "compose-navigation3", "compose-navigation3-viewmodel", "jetbrains-lifecycle-viewmodelCompose"]
